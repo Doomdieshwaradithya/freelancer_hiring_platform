@@ -39,9 +39,15 @@ app.use('/api/jobs', require('./routes/jobRoutes'));
 app.use('/api/applications', require('./routes/applicationRoutes'));
 app.use('/api/chat', require('./routes/chatRoutes'));
 
+const mongoose = require('mongoose');
+
 // Health check route
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'Server is running', timestamp: new Date().toISOString() });
+    res.json({
+        status: 'Server is running',
+        dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+        timestamp: new Date().toISOString()
+    });
 });
 
 // Socket.io connection handling
