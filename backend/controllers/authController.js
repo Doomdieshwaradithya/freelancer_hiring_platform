@@ -57,16 +57,19 @@ const loginUser = async (req, res) => {
         }
 
         const { email, password } = req.body;
+        console.log(`Login attempt for email: ${email}`);
 
         // Find user and include password field
         const user = await User.findOne({ email }).select('+password');
         if (!user) {
+            console.log(`User not found: ${email}`);
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
         // Check password
         const isMatch = await user.matchPassword(password);
         if (!isMatch) {
+            console.log(`Password mismatch for user: ${email}`);
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
@@ -80,8 +83,12 @@ const loginUser = async (req, res) => {
             token: generateToken(user._id)
         });
     } catch (error) {
-        console.error('Login error:', error.message);
-        res.status(500).json({ message: 'Server error during login' });
+        console.error('SERVER LOGIN ERROR:', error);
+        res.status(500).json({
+            message: 'Server error during login',
+            error: error.message,
+            stack: process.env.NODE_ENV !== 'production' ? error.stack : undefined
+        });
     }
 };
 

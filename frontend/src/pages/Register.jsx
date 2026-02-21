@@ -3,7 +3,7 @@ import { Link, useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { register } from '../api/auth.js'
 import toast from 'react-hot-toast'
-import { FiUser, FiMail, FiLock, FiBriefcase, FiUserCheck } from 'react-icons/fi'
+import { FiUser, FiMail, FiLock, FiBriefcase, FiUserCheck, FiZap, FiArrowRight, FiCheck } from 'react-icons/fi'
 
 function getErrorMessage(err, fallback) {
   const data = err?.response?.data
@@ -32,7 +32,7 @@ export function Register() {
     try {
       const { data } = await register({ name, email, password, role })
       await setAuth(data.token)
-      toast.success('Account created!')
+      toast.success('Account created! Welcome to HirePro 🎉')
       navigate(role === 'client' ? '/post-job' : '/jobs', { replace: true })
     } catch (err) {
       toast.error(getErrorMessage(err, 'Registration failed'))
@@ -42,113 +42,126 @@ export function Register() {
   }
 
   return (
-    <div className="max-w-md mx-auto animate-fade-in py-4">
-      <div className="bg-white rounded-2xl shadow-xl shadow-stone-200/50 border border-amber-100 p-8 md:p-10 transition-all hover:shadow-2xl hover:shadow-amber-200/30">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-stone-800 mb-2">Create account</h2>
-          <p className="text-stone-500">Join HirePro and start connecting</p>
+    <div className="min-h-[calc(100vh-56px)] flex items-center justify-center py-8 px-4">
+      <div className="w-full max-w-md animate-slide-up">
+        {/* Logo */}
+        <div className="flex items-center justify-center mb-8">
+          <Link to="/" className="logo-container group">
+            <div className="w-10 h-10 logo-icon-glow rounded-xl flex items-center justify-center animate-logo-pulse transition-transform group-hover:scale-110">
+              <FiZap className="w-6 h-6 text-white" />
+            </div>
+            <span className="font-black text-white text-2xl tracking-tighter uppercase italic">QuickSkillr</span>
+          </Link>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-stone-700">Name</label>
-            <div className="relative">
-              <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 w-5 h-5" />
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                placeholder="Your name"
-                className="w-full pl-11 pr-4 py-3 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200"
-              />
-            </div>
+        <div className="bg-zinc-900 rounded-2xl shadow-xl shadow-black/40 border border-zinc-800 p-8 text-zinc-200">
+          <div className="text-center mb-7">
+            <h1 className="text-2xl font-bold text-white mb-1.5">Create your account</h1>
+            <p className="text-zinc-500 text-sm">Join thousands of clients and freelancers</p>
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-stone-700">Email</label>
-            <div className="relative">
-              <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 w-5 h-5" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="you@example.com"
-                className="w-full pl-11 pr-4 py-3 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-stone-700">Password</label>
-            <div className="relative">
-              <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 w-5 h-5" />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                placeholder="Min 6 characters"
-                className="w-full pl-11 pr-4 py-3 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <label className="block text-sm font-medium text-stone-700">I am a</label>
-            <div className="grid grid-cols-2 gap-3">
+          {/* Role toggle */}
+          <div className="grid grid-cols-2 gap-3 mb-6 p-1 bg-zinc-950 rounded-xl border border-zinc-800">
+            {[
+              { value: 'freelancer', label: 'Freelancer', icon: FiUserCheck },
+              { value: 'client', label: 'Client', icon: FiBriefcase },
+            ].map(({ value, label, icon: Icon }) => (
               <button
+                key={value}
                 type="button"
-                onClick={() => setRole('freelancer')}
-                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 transition-all duration-200 ${
-                  role === 'freelancer'
-                    ? 'border-teal-500 bg-teal-50 text-teal-800'
-                    : 'border-stone-200 text-stone-600 hover:border-stone-300'
-                }`}
+                onClick={() => setRole(value)}
+                className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${role === value
+                  ? 'bg-zinc-800 text-rose-500 shadow-sm'
+                  : 'text-zinc-500 hover:text-zinc-300'
+                  }`}
               >
-                <FiUserCheck className="w-5 h-5" />
-                Freelancer
+                <Icon className="w-4 h-4" />
+                {label}
               </button>
-              <button
-                type="button"
-                onClick={() => setRole('client')}
-                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 transition-all duration-200 ${
-                  role === 'client'
-                    ? 'border-amber-500 bg-amber-50 text-amber-800'
-                    : 'border-stone-200 text-stone-600 hover:border-stone-300'
-                }`}
-              >
-                <FiBriefcase className="w-5 h-5" />
-                Client
-              </button>
-            </div>
+            ))}
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 py-3 rounded-xl font-semibold hover:from-amber-400 hover:to-amber-500 disabled:opacity-70 transition-all duration-200 shadow-lg shadow-amber-500/25 hover:shadow-xl active:scale-[0.98]"
-          >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="w-4 h-4 border-2 border-stone-400/30 border-t-stone-800 rounded-full animate-spin" />
-                Creating account...
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-zinc-300">Full name</label>
+              <div className="relative">
+                <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4" />
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  placeholder="Your name"
+                  className="w-full pl-10 pr-4 py-3 border border-zinc-800 rounded-xl bg-zinc-950 text-white placeholder-zinc-600 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-zinc-300">Email address</label>
+              <div className="relative">
+                <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="you@example.com"
+                  className="w-full pl-10 pr-4 py-3 border border-zinc-800 rounded-xl bg-zinc-950 text-white placeholder-zinc-600 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-zinc-300">Password</label>
+              <div className="relative">
+                <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4" />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  placeholder="Min. 6 characters"
+                  className="w-full pl-10 pr-4 py-3 border border-zinc-800 rounded-xl bg-zinc-950 text-white placeholder-zinc-600 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold py-3 rounded-xl shadow-md shadow-rose-600/25 hover:shadow-lg hover:shadow-rose-600/30 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 mt-2"
+            >
+              {loading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                <>Create Account <FiArrowRight className="w-4 h-4" /></>
+              )}
+            </button>
+          </form>
+
+          {/* Trust badges */}
+          <div className="mt-5 flex items-center justify-center gap-4 text-xs text-zinc-500">
+            {['Free forever', 'No credit card', 'Cancel anytime'].map((t) => (
+              <span key={t} className="flex items-center gap-1">
+                <FiCheck className="w-3 h-3 text-emerald-500" /> {t}
               </span>
-            ) : (
-              'Sign Up'
-            )}
-          </button>
-        </form>
+            ))}
+          </div>
 
-        <p className="mt-6 text-center text-stone-500">
-          Already have an account?{' '}
-          <Link to="/login" className="text-violet-600 font-semibold hover:text-violet-700 hover:underline transition-colors">
-            Login
-          </Link>
-        </p>
+          <p className="mt-5 text-center text-sm text-zinc-500">
+            Already have an account?{' '}
+            <Link to="/login" className="text-rose-500 font-semibold hover:text-rose-600 transition-colors">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
+
     </div>
   )
 }
