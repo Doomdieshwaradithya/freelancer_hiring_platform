@@ -156,14 +156,19 @@ const deleteJob = async (req, res) => {
 // @access  Private (Client)
 const getMyJobs = async (req, res) => {
     try {
+        console.log(`GET_MY_JOBS: Fetching jobs for client ID: ${req.user._id}`);
         const jobs = await Job.find({ clientId: req.user._id })
             .populate('hiredFreelancer', 'name email profileImage')
             .sort({ createdAt: -1 });
 
+        console.log(`GET_MY_JOBS: Found ${jobs.length} jobs`);
         res.json(jobs);
     } catch (error) {
-        console.error('Get my jobs error:', error.message);
-        res.status(500).json({ message: 'Server error' });
+        console.error('GET_MY_JOBS ERROR:', error);
+        res.status(500).json({
+            message: 'Server error fetching your jobs',
+            error: error.message
+        });
     }
 };
 

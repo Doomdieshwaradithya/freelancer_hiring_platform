@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getMyApplications } from '../api/applications.js'
+import { FiBriefcase, FiDollarSign, FiClock, FiMessageSquare } from 'react-icons/fi'
+
+const STATUS_COLORS = {
+  pending: 'bg-amber-900/30 text-amber-400 border border-amber-800',
+  accepted: 'bg-emerald-900/30 text-emerald-400 border border-emerald-800',
+  rejected: 'bg-red-900/30 text-red-400 border border-red-800',
+}
 
 export function MyApplications() {
   const [applications, setApplications] = useState([])
@@ -15,67 +22,72 @@ export function MyApplications() {
 
   if (loading) {
     return (
-      <div className="text-center py-16">
-        <div className="w-10 h-10 border-2 border-teal-500/30 border-t-teal-500 rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-stone-600">Loading applications...</p>
+      <div className="space-y-4 animate-fade-in text-zinc-200">
+        <h1 className="text-2xl font-bold text-white mb-6">My Applications</h1>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6 h-32 skeleton" />
+        ))}
       </div>
     )
   }
 
+  console.log('MY_APPLICATIONS: Rendering with apps length:', applications.length);
   return (
-    <div className="animate-fade-in">
-      <h1 className="text-2xl font-bold text-stone-800 mb-6">My Applications</h1>
+    <div className="animate-fade-in text-zinc-200">
+      <h1 className="text-2xl font-bold text-white mb-6">My Applications</h1>
 
       {applications.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-stone-200 p-12 text-center text-stone-600 shadow-sm">
-          <p>You haven&apos;t applied to any jobs yet.</p>
-          <Link to="/jobs" className="text-violet-600 font-semibold hover:underline mt-2 inline-block">
-            Browse jobs
+        <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-14 text-center shadow-sm">
+          <div className="w-14 h-14 bg-rose-950/30 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-rose-900/30">
+            <FiBriefcase className="w-7 h-7 text-rose-500" />
+          </div>
+          <h3 className="font-semibold text-white mb-1">No applications yet</h3>
+          <p className="text-zinc-500 text-sm mb-6">Start browsing jobs and apply to find your next project.</p>
+          <Link
+            to="/jobs"
+            className="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md shadow-rose-600/25 transition-all hover:scale-[1.02]"
+          >
+            Browse All Jobs
           </Link>
         </div>
       ) : (
-        <div className="space-y-4">
-          {applications.map((app) => {
-            const job = typeof app.jobId === 'object' ? app.jobId : null
-            const client = job && typeof job.clientId === 'object' ? job.clientId : null
-            const jobId = typeof app.jobId === 'object' ? app.jobId._id : app.jobId
-
-            return (
-              <div
-                key={app._id}
-                className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm hover:shadow-md hover:border-teal-100 transition-all"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <Link
-                      to={`/jobs/${jobId}`}
-                      className="font-semibold text-stone-800 hover:text-teal-600 transition-colors"
-                    >
-                      {job?.title ?? 'Job'}
+        <div className="space-y-4 stagger">
+          {applications.map((app) => (
+            <div key={app._id} className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6 shadow-sm hover:shadow-md hover:border-zinc-700 transition-all group animate-slide-up">
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
+                    <Link to={`/jobs/${app.jobId?._id}`} className="text-lg font-bold text-white group-hover:text-rose-500 transition-colors">
+                      {app.jobId?.title}
                     </Link>
-                    {client && (
-                      <p className="text-stone-500 text-sm">Client: {client.name}</p>
-                    )}
-                    <p className="text-stone-600 text-sm mt-2 line-clamp-2">{app.proposal}</p>
-                    {app.bidAmount ? (
-                      <p className="text-amber-700 font-semibold mt-1">Your bid: ${app.bidAmount}</p>
-                    ) : null}
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${STATUS_COLORS[app.status] || STATUS_COLORS.pending}`}>
+                      {app.status}
+                    </span>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      app.status === 'pending'
-                        ? 'bg-amber-100 text-amber-800'
-                        : app.status === 'accepted'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-stone-100 text-stone-600'
-                    }`}
-                  >
-                    {app.status}
-                  </span>
+                  <p className="text-zinc-500 text-sm line-clamp-2 mb-3">{app.proposal}</p>
+                  <div className="flex gap-4 text-xs font-medium text-zinc-400">
+                    <span className="flex items-center gap-1.5">
+                      <FiDollarSign className="w-3.5 h-3.5 text-emerald-500" />
+                      Bid: <span className="text-white">${app.bidAmount}</span>
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <FiClock className="w-3.5 h-3.5 text-rose-500" />
+                      Applied on {new Date(app.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
                 </div>
+                {app.status === 'accepted' && (
+                  <Link
+                    to={`/chat?with=${app.jobId?.clientId?._id}`}
+                    className="flex-shrink-0 bg-rose-600 hover:bg-rose-700 text-white p-2.5 rounded-xl shadow-md shadow-rose-600/20 hover:scale-105 transition-all"
+                    title="Open Chat with Client"
+                  >
+                    <FiMessageSquare className="w-5 h-5" />
+                  </Link>
+                )}
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
       )}
     </div>

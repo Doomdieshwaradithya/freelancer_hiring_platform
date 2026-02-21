@@ -11,6 +11,7 @@ import { JobDetail } from './pages/JobDetail.jsx'
 import { PostJob } from './pages/PostJob.jsx'
 import { Dashboard } from './pages/Dashboard.jsx'
 import { MyApplications } from './pages/MyApplications.jsx'
+import { Chat } from './pages/Chat.jsx'
 
 export default function App() {
   return (
@@ -49,6 +50,16 @@ export default function App() {
               <Layout>
                 <ProtectedRoute role="freelancer">
                   <MyApplications />
+                </ProtectedRoute>
+              </Layout>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <Layout>
+                <ProtectedRoute>
+                  <Chat />
                 </ProtectedRoute>
               </Layout>
             }
