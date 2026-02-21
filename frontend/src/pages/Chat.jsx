@@ -6,7 +6,7 @@ import { getConversations, getConversation, sendMessage } from '../api/chat.js'
 import toast from 'react-hot-toast'
 import { FiSend, FiMessageSquare, FiUser, FiZap, FiUsers } from 'react-icons/fi'
 
-const SOCKET_URL = 'http://localhost:5000'
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 export function Chat() {
     const { user } = useAuth()
