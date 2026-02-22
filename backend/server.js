@@ -26,7 +26,7 @@ const io = new Server(server, {
 
 // Middleware
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: true, // Allow all origins for debugging
     credentials: true
 }));
 app.use(express.json());
@@ -49,6 +49,7 @@ app.get('/api/health', (req, res) => {
     res.json({
         status: 'Server is running',
         dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+        frontendUrl: process.env.FRONTEND_URL,
         timestamp: new Date().toISOString()
     });
 });
